@@ -96,13 +96,13 @@ def create_page(row, token, db_id):
     data = {
         "parent": {"database_id": db_id},
         "properties": {
-            "作品名": {"title": [{"text": {"content": title}}]},
-            "放送時期": {"select": {"name": season}},
-            "制作会社": {"rich_text": [{"text": {"content": company}}]},
-            "公式サイト": {"url": website},
-            "監督": {"rich_text": [{"text": {"content": director}}]},
-            "声優": {"rich_text": [{"text": {"content": voice_casts}}]},
-            "スタッフ": {"rich_text": [{"text": {"content": staff_all}}]},
+            "作品名": {"title": [{"text": {"content": title or "タイトル不明"}}]},
+            "放送時期": {"select": {"name": season or "未設定"}},
+            "制作会社": {"rich_text": [{"text": {"content": company or "不明"}}]},
+            "公式サイト": {"url": website if website else None},
+            "監督": {"rich_text": [{"text": {"content": director or "不明"}}]},
+            "声優": {"rich_text": [{"text": {"content": voice_casts or "不明"}}]},
+            "スタッフ": {"rich_text": [{"text": {"content": staff_all or "不明"}}]},
         }
     }
 
