@@ -13,7 +13,7 @@ database_id = st.text_input("🗂️ NotionのデータベースID")
 
 # 🎯 Annictの seasonName を Notion用の形式に変換（例：2025-spring → 2025春）
 def convert_season(season_name):
-    season_map = {"winter": "冬", "spring": "春", "summer": "夏", "fall": "秋"}
+    season_map = {"WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "FALL": "秋"}
     try:
         year, season_en = season_name.split("-")
         return f"{year}{season_map[season_en]}"
@@ -90,7 +90,7 @@ def create_page(row, token, db_id):
     website = row.get("officialSiteUrl", "") or ""
 
     staff_list = row.get("staffs", {}).get("nodes", [])
-    director = ", ".join([s.get("name", "") for s in staff_list if "監督" in s.get("roleText", "")])
+    director = ", ".join([s.get("name", "") for s in staff_list if s.get("roleText", "").strip() == "監督"])
     company = ", ".join([s.get("name", "") for s in staff_list if "アニメーション制作" in s.get("roleText", "")])
     staff_all = ", ".join([f'{s.get("name", "")}：{s.get("roleText", "")}' for s in staff_list])[:2000]
 
