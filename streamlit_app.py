@@ -12,11 +12,19 @@ notion_token = st.text_input("🔑 Notionの統合トークン", type="password"
 database_id = st.text_input("🗂️ NotionのデータベースID")
 
 # 🎯 Annictの seasonName を Notion用の形式に変換（例：2025-spring → 2025春）
-def convert_season(season_en, year):
+def convert_season(season_name):
     season_map = {
         "WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "FALL": "秋"
     }
-    return f"{year}{season_map.get(season_en.upper(), season_en)}"
+
+    try:
+        if "-" in season_name:
+            year, season_en = season_name.lower().split("-")
+            return f"{year}{season_map[season_en.upper()]}"
+        else:
+            return season_map.get(season_name.upper(), season_name)
+    except:
+        return season_name
 
 
 # 📥 Annict APIからアニメ情報を取得
@@ -85,7 +93,7 @@ def create_page(row, token, db_id):
     }
 
     title = row["title"]
-    season = convert_season(row["seasonName"], row["seasonYear"])
+    season = convert_season(row["seasonName"])
     episodes = row.get("episodesCount") or 0
     website = row.get("officialSiteUrl", "") or ""
 
