@@ -30,27 +30,31 @@ def get_annict_data(season):
 
     query = f"""
     {{
-      searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
+    searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
         nodes {{
-          title
-          seasonName
-          episodesCount
-          officialSiteUrl
-          staffs {{
+        title
+        seasonName
+        episodesCount
+        officialSiteUrl
+        staffs {{
+            nodes {{
             name
             roleText
-          }}
-          casts {{
+            }}
+        }}
+        casts {{
+            nodes {{
             name
             character {{
-              name
+                name
             }}
-          }}
-          productionCompanies {{
-            name
-          }}
+            }}
         }}
-      }}
+        productionCompanies {{
+            name
+        }}
+        }}
+    }}
     }}
     """
 
