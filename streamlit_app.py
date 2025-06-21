@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 
+ANNICT_TOKEN = st.secrets["ANNICT_TOKEN"]
+
 st.title("🎬 Annict → Notion 自動登録ツール")
 
 # 📌 Notion用入力欄
@@ -21,9 +23,8 @@ def convert_season(season_en, year):
 
 # 📥 Annict APIからアニメ情報を取得
 def get_annict_data(season):
-    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"
     headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Authorization": f"Bearer {ANNICT_TOKEN}",
         "Content-Type": "application/json"
     }
 
