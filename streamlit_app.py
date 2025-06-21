@@ -22,7 +22,7 @@ def convert_season(season_name):
 
 # 📥 Annict APIからアニメ情報取得
 def get_annict_data(season):
-    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"  # ← あなたのトークンに置き換えてください
+    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"  # ← あなたのAnnictトークン
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -30,27 +30,27 @@ def get_annict_data(season):
 
     query = f"""
     {{
-        searchWorks(seasons: ["2025-spring"], orderBy: {field: WATCHERS_COUNT, direction: DESC}) {
-            nodes {
-            title
-            seasonName
-            episodesCount
-            officialSiteUrl
-            staffs {
-                name
-                roleText
-            }
-            casts {
-                name
-                character {
-                name
-                }
-            }
-            productionCompanies {
-                name
-            }
-            }
-        }
+      searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
+        nodes {{
+          title
+          seasonName
+          episodesCount
+          officialSiteUrl
+          staffs {{
+            name
+            roleText
+          }}
+          casts {{
+            name
+            character {{
+              name
+            }}
+          }}
+          productionCompanies {{
+            name
+          }}
+        }}
+      }}
     }}
     """
 
@@ -82,7 +82,6 @@ def create_page(row, token, db_id):
     episodes = row.get("episodesCount") or 0
     director = ", ".join([s["name"] for s in row.get("staffs", []) if "監督" in s["roleText"]])
     company = ", ".join([p["name"] for p in row.get("productionCompanies", [])])
-    teaser = row.get("images", {}).get("recommendedImageUrl", "")
     website = row.get("officialSiteUrl", "")
     voice_casts = ", ".join([
         f'{c["name"]}（{c["character"]["name"]}）'
@@ -101,7 +100,6 @@ def create_page(row, token, db_id):
             "制作会社": {"rich_text": [{"text": {"content": company}}]},
             "公式サイト": {"url": website},
             "監督": {"rich_text": [{"text": {"content": director}}]},
-            "ティザービジュアル": {"url": teaser},
             "声優": {"rich_text": [{"text": {"content": voice_casts}}]},
             "スタッフ": {"rich_text": [{"text": {"content": staff_all}}]},
         }
