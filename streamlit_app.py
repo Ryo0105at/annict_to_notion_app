@@ -36,7 +36,7 @@ def get_annict_data(season):
           seasonName
           episodesCount
           officialSiteUrl
-          mediaText
+          media
           staffs {{
             nodes {{
               roleText
