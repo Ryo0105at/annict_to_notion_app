@@ -17,16 +17,15 @@ def convert_season(season_name):
         "WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "FALL": "秋"
     }
 
-    # 年を別途受け取る必要がある場合
-    if "-" in season_name:
-        year, season_en = season_name.lower().split("-")
-        return f"{year}{season_map[season_en]}"
-    else:
-        # ここに来るということは season_name = "SPRING" のような形式
-        # 年情報を別途 row から取得（Annict APIでは seasonYear は別フィールド）
-        return season_map.get(season_name.upper(), season_name)
-
+    try:
+        if "-" in season_name:
+            year, season_en = season_name.lower().split("-")
+            return f"{year}{season_map[season_en.upper()]}"
+        else:
+            return season_map.get(season_name.upper(), season_name)
+    except:
         return season_name
+
 
 # 📥 Annict APIからアニメ情報を取得
 def get_annict_data(season):
