@@ -13,11 +13,19 @@ database_id = st.text_input("🗂️ NotionのデータベースID")
 
 # 🎯 Annictの seasonName を Notion用の形式に変換（例：2025-spring → 2025春）
 def convert_season(season_name):
-    season_map = {"winter": "冬", "spring": "春", "summer": "夏", "fall": "秋"}
-    try:
-        year, season_en = season_name.lower().split("-")  # 小文字に変換
+    season_map = {
+        "WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "FALL": "秋"
+    }
+
+    # 年を別途受け取る必要がある場合
+    if "-" in season_name:
+        year, season_en = season_name.lower().split("-")
         return f"{year}{season_map[season_en]}"
-    except:
+    else:
+        # ここに来るということは season_name = "SPRING" のような形式
+        # 年情報を別途 row から取得（Annict APIでは seasonYear は別フィールド）
+        return season_map.get(season_name.upper(), season_name)
+
         return season_name
 
 # 📥 Annict APIからアニメ情報を取得
