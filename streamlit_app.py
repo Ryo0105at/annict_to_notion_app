@@ -94,7 +94,7 @@ def create_page(row, token, db_id):
         "parent": {"database_id": db_id},
         "properties": {
             "タイトル": {"title": [{"text": {"content": title}}]},
-            "放送時期(2025春)": {"select": {"name": season}},
+            "放送時期": {"select": {"name": season}},
             "制作会社": {"rich_text": [{"text": {"content": company}}]},
             "公式サイト": {"url": website},
             "監督": {"rich_text": [{"text": {"content": director}}]},
