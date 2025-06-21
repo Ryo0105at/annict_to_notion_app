@@ -88,11 +88,12 @@ def create_page(row, token, db_id):
     season = convert_season(row["seasonName"])
     episodes = row.get("episodesCount") or 0
     website = row.get("officialSiteUrl", "") or ""
+    teaser_image = row.get("image", {}).get("recommendedImageUrl", "") or None
 
     staff_list = row.get("staffs", {}).get("nodes", [])
     director = ", ".join([s.get("name", "") for s in staff_list if s.get("roleText", "").strip() == "監督"])
     company = ", ".join([s.get("name", "") for s in staff_list if "アニメーション制作" in s.get("roleText", "")])
-    staff_all = ", ".join([f'{s.get("name", "")}：{s.get("roleText", "")}' for s in staff_list])[:2000]
+    staff_all = ", ".join([f'{s.get("roleText", "")}:{s.get("name", "")}' for s in staff_list])[:2000]
 
     cast_list = row.get("casts", {}).get("nodes", [])
     voice_casts = ", ".join([
@@ -110,6 +111,7 @@ def create_page(row, token, db_id):
             "監督": {"rich_text": [{"text": {"content": director or "不明"}}]},
             "声優": {"rich_text": [{"text": {"content": voice_casts or "不明"}}]},
             "スタッフ": {"rich_text": [{"text": {"content": staff_all or "不明"}}]},
+            "ティザービジュアル": {"url": teaser_image},
         }
     }
 
