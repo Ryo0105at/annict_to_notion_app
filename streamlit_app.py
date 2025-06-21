@@ -128,8 +128,7 @@ if st.button("Notionに登録する"):
         else:
             with st.spinner("Notionに登録中..."):
                 for row in works:
-                    success = create_page(row, notion_token, database_id)
-                    if success:
-                        st.success(f'✅ {row["title"]} を登録しました')
-                    else:
-                        st.error(f'❌ {row["title"]} の登録に失敗しました')
+                    result = create_page(row, notion_token, database_id)
+                    if not result["ok"]:
+                        st.error(f'❌ {result["title"]} の登録に失敗 (Status {result["status"]})')
+                        st.code(result["text"])
