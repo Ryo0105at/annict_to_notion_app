@@ -84,10 +84,10 @@ def create_page(row, token, db_id):
     season = convert_season(row["seasonName"])
     episodes = row.get("episodesCount") or 0
     website = row.get("officialSiteUrl", "")
-    company = ", ".join([p["name"] for p in row.get("productionCompanies", [])])
 
     staff_list = row.get("staffs", {}).get("nodes", [])
     director = ", ".join([s["name"] for s in staff_list if "監督" in s["roleText"]])
+    company = ", ".join([s["name"] for s in staff_list if "アニメーション制作" in s["roleText"]])
     staff_all = ", ".join([f'{s["name"]}：{s["roleText"]}' for s in staff_list])
 
     cast_list = row.get("casts", {}).get("nodes", [])
@@ -108,7 +108,7 @@ def create_page(row, token, db_id):
 
     res = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     return res.status_code == 200
-
+    
 # 🚀 登録実行
 if st.button("Notionに登録する"):
     if not notion_token or not database_id:
