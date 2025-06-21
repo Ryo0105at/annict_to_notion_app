@@ -30,28 +30,29 @@ def get_annict_data(season):
 
     query = f"""
     {{
-    searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
+      searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
         nodes {{
-        title
-        seasonName
-        episodesCount
-        officialSiteUrl
-        staffs {{
+          title
+          seasonName
+          episodesCount
+          officialSiteUrl
+          mediaText
+          staffs {{
             nodes {{
-            name
-            roleText
+              roleText
+              name
             }}
-        }}
-        casts {{
+          }}
+          casts {{
             nodes {{
-            name
-            character {{
+              name
+              character {{
                 name
+              }}
             }}
-            }}
+          }}
         }}
-        }}
-    }}
+      }}
     }}
     """
 
@@ -67,7 +68,11 @@ def get_annict_data(season):
         st.error("❌ Annict API エラー: " + result["errors"][0].get("message", "不明なエラー"))
         return []
 
-    return result.get("data", {}).get("searchWorks", {}).get("nodes", [])
+    all_works = result.get("data", {}).get("searchWorks", {}).get("nodes", [])
+
+    filtered_works = [work for work in all_works if work.get("mediaText") != "Web"]
+
+    return filtered_works
 
 # 📝 Notion に1作品を登録
 def create_page(row, token, db_id):
