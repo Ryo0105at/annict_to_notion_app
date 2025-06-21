@@ -13,9 +13,9 @@ database_id = st.text_input("🗂️ NotionのデータベースID")
 
 # 🎯 Annictの seasonName を Notion用の形式に変換（例：2025-spring → 2025春）
 def convert_season(season_name):
-    season_map = {"WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "FALL": "秋"}
+    season_map = {"winter": "冬", "spring": "春", "summer": "夏", "fall": "秋"}
     try:
-        year, season_en = season_name.split("-")
+        year, season_en = season_name.lower().split("-")  # 小文字に変換
         return f"{year}{season_map[season_en]}"
     except:
         return season_name
@@ -37,9 +37,6 @@ def get_annict_data(season):
         episodesCount
         officialSiteUrl
         media
-        image {{
-            recommendedImageUrl
-        }}
         staffs {{
             nodes {{
             roleText
@@ -91,7 +88,6 @@ def create_page(row, token, db_id):
     season = convert_season(row["seasonName"])
     episodes = row.get("episodesCount") or 0
     website = row.get("officialSiteUrl", "") or ""
-    teaser_image = row.get("image", {}).get("recommendedImageUrl", "") or None
 
     staff_list = row.get("staffs", {}).get("nodes", [])
     director = ", ".join([s.get("name", "") for s in staff_list if s.get("roleText", "").strip() == "監督"])
@@ -114,7 +110,6 @@ def create_page(row, token, db_id):
             "監督": {"rich_text": [{"text": {"content": director or "不明"}}]},
             "声優": {"rich_text": [{"text": {"content": voice_casts or "不明"}}]},
             "スタッフ": {"rich_text": [{"text": {"content": staff_all or "不明"}}]},
-            "ティザービジュアル": {"url": teaser_image},
         }
     }
 
