@@ -71,7 +71,7 @@ def get_annict_data(season):
     all_works = result.get("data", {}).get("searchWorks", {}).get("nodes", [])
 
     # ✅ media = "web" を除外
-    filtered_works = [work for work in all_works if work.get("media") != "Web"]
+    filtered_works = [work for work in all_works if work.get("media") != "WEB"]
 
     return filtered_works
 
