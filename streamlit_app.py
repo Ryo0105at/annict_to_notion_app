@@ -22,7 +22,7 @@ def convert_season(season_name):
 
 # 📥 Annict API からデータ取得
 def get_annict_data(season):
-    ACCESS_TOKEN = "YOUR_ANNICT_ACCESS_TOKEN"  # ← あなたのAnnictアクセストークンに置き換えてください
+    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"  # ← あなたのAnnictアクセストークンに置き換えてください
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -92,7 +92,7 @@ def create_page(row, token, db_id):
         "parent": {"database_id": db_id},
         "properties": {
             "タイトル": {"title": [{"text": {"content": title}}]},
-            "放送時期(2025春)": {"select": {"name": season}},
+            "放送時期": {"select": {"name": season}},
             "制作会社": {"rich_text": [{"text": {"content": company}}]},
             "公式サイト": {"url": website},
             "監督": {"rich_text": [{"text": {"content": director}}]},
