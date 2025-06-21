@@ -115,3 +115,21 @@ def create_page(row, token, db_id):
         "status": res.status_code,
         "text": res.text
     }
+
+
+# 🚀 登録実行
+if st.button("Notionに登録する"):
+    if not notion_token or not database_id:
+        st.warning("NotionのトークンとデータベースIDを入力してください。")
+    else:
+        works = get_annict_data(season)
+        if not works:
+            st.warning("Annictからデータを取得できませんでした。")
+        else:
+            with st.spinner("Notionに登録中..."):
+                for row in works:
+                    success = create_page(row, notion_token, database_id)
+                    if success:
+                        st.success(f'✅ {row["title"]} を登録しました')
+                    else:
+                        st.error(f'❌ {row["title"]} の登録に失敗しました')
