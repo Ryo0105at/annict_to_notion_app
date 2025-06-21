@@ -4,7 +4,7 @@ import textwrap
 
 ANNICT_TOKEN = st.secrets["ANNICT_TOKEN"]
 
-st.title("🎬 Annict → Notion 自動登録ツール")
+st.title("Notion アニメ自動登録ツール")
 
 with st.expander("🔑 Notionの統合トークン・データベースIDの取得手順"):
     st.markdown(textwrap.dedent("""
