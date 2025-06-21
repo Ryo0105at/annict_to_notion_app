@@ -4,6 +4,22 @@ import requests
 ANNICT_TOKEN = st.secrets["ANNICT_TOKEN"]
 
 st.title("🎬 Annict → Notion 自動登録ツール")
+with st.expander("🔑 Notionの統合トークン・データベースIDの取得手順"):
+    st.markdown("""
+#### 📌 Notionの統合トークンの取得手順
+1. [Notionのインテグレーションページ](https://www.notion.so/my-integrations) にアクセス。
+2. 「+ New integration」をクリック。
+3. 名前を設定し、「Internal Integration Token」を生成。
+4. 生成されたトークンをこのアプリの「Notionの統合トークン」にコピペ。
+
+#### 📁 NotionのデータベースIDの取得手順
+1. 登録したいNotionデータベースをブラウザで開く。
+2. URLの形式：`https://www.notion.so/ユーザー名/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx?v=...`
+3. `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` の部分が **データベースID**。
+4. それをこのアプリの「NotionのデータベースID」にコピペ。
+
+💡 Notionのデータベースには「インテグレーションを共有」する設定も必要です！
+""")
 
 # 📌 Notion用入力欄
 season = st.selectbox("📅 登録するクールを選んでください", [
