@@ -30,31 +30,28 @@ def get_annict_data(season):
 
     query = f"""
     {{
-      searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
+    searchWorks(seasons: ["{season}"], orderBy: {{field: WATCHERS_COUNT, direction: DESC}}) {{
         nodes {{
-          title
-          seasonName
-          episodesCount
-          officialSiteUrl
-          staffs {{
+        title
+        seasonName
+        episodesCount
+        officialSiteUrl
+        staffs {{
             nodes {{
-              name
-              roleText
-            }}
-          }}
-          casts {{
-            nodes {{
-              name
-              character {{
-                name
-              }}
-            }}
-          }}
-          productionCompanies {{
             name
-          }}
+            roleText
+            }}
         }}
-      }}
+        casts {{
+            nodes {{
+            name
+            character {{
+                name
+            }}
+            }}
+        }}
+        }}
+    }}
     }}
     """
 
@@ -108,7 +105,7 @@ def create_page(row, token, db_id):
 
     res = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     return res.status_code == 200
-    
+
 # 🚀 登録実行
 if st.button("Notionに登録する"):
     if not notion_token or not database_id:
