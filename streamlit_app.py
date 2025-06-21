@@ -11,7 +11,7 @@ season = st.selectbox("📅 登録するクールを選んでください", [
 notion_token = st.text_input("🔑 Notionの統合トークン", type="password")
 database_id = st.text_input("🗂️ NotionのデータベースID")
 
-# 🎯 Annict seasonName → Notion表記変換（例：2025-spring → 2025春）
+# 🎯 Annict seasonName → Notion用表記に変換（例：2025-spring → 2025春）
 def convert_season(season_name):
     season_map = {"winter": "冬", "spring": "春", "summer": "夏", "fall": "秋"}
     try:
@@ -20,9 +20,9 @@ def convert_season(season_name):
     except:
         return season_name
 
-# 📥 Annict API からデータ取得
-def get_annict_data(season):def get_annict_data(season):
-    ACCESS_TOKEN = "YOUR_ANNICT_ACCESS_TOKEN"  # ← あなたのAnnictトークンに置き換えてください
+# 📥 Annict APIからアニメ情報取得
+def get_annict_data(season):
+    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"  # ← あなたのトークンに置き換えてください
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -62,19 +62,16 @@ def get_annict_data(season):def get_annict_data(season):
     try:
         result = res.json()
     except Exception as e:
-        st.error(f"❌ Annict APIのレスポンスをJSONとして解析できませんでした: {e}")
+        st.error(f"❌ Annict APIレスポンスの解析に失敗: {e}")
         return []
 
-    # エラーメッセージが含まれていれば表示
     if "errors" in result:
         st.error("❌ Annict API エラー: " + result["errors"][0].get("message", "不明なエラー"))
         return []
 
-    # データが正しく返ってきていれば返す
     return result.get("data", {}).get("searchWorks", {}).get("nodes", [])
 
-
-# 📝 Notionページ登録
+# 📝 Notion にページを作成
 def create_page(row, token, db_id):
     headers = {
         "Authorization": f"Bearer {token}",
@@ -82,12 +79,12 @@ def create_page(row, token, db_id):
         "Content-Type": "application/json"
     }
 
-    # データ整形
+    # 各データの整形
     title = row["title"]
     season = convert_season(row["seasonName"])
-    episodes = row["episodesCount"] or 0
-    director = ", ".join([s["name"] for s in row["staffs"] if "監督" in s["roleText"]])
-    company = ", ".join([p["name"] for p in row["productionCompanies"]])
+    episodes = row.get("episodesCount") or 0
+    director = ", ".join([s["name"] for s in row.get("staffs", []) if "監督" in s["roleText"]])
+    company = ", ".join([p["name"] for p in row.get("productionCompanies", [])])
     teaser = row.get("images", {}).get("recommendedImageUrl", "")
     website = row.get("officialSiteUrl", "")
     voice_casts = ", ".join([
@@ -103,7 +100,7 @@ def create_page(row, token, db_id):
         "parent": {"database_id": db_id},
         "properties": {
             "タイトル": {"title": [{"text": {"content": title}}]},
-            "放送時期": {"select": {"name": season}},
+            "放送時期(2025春)": {"select": {"name": season}},
             "制作会社": {"rich_text": [{"text": {"content": company}}]},
             "公式サイト": {"url": website},
             "監督": {"rich_text": [{"text": {"content": director}}]},
@@ -116,7 +113,7 @@ def create_page(row, token, db_id):
     res = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     return res.status_code == 200
 
-# 🚀 登録ボタン押下時
+# 🚀 実行部分
 if st.button("Notionに登録する"):
     if not notion_token or not database_id:
         st.warning("NotionのトークンとデータベースIDを入力してください。")
