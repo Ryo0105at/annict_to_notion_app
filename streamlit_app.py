@@ -21,8 +21,8 @@ def convert_season(season_name):
         return season_name
 
 # 📥 Annict API からデータ取得
-def get_annict_data(season):
-    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"  # ← あなたのAnnictアクセストークンに置き換えてください
+def get_annict_data(season):def get_annict_data(season):
+    ACCESS_TOKEN = "YOUR_ANNICT_ACCESS_TOKEN"  # ← あなたのAnnictトークンに置き換えてください
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -56,12 +56,23 @@ def get_annict_data(season):
       }}
     }}
     """
+
     res = requests.post("https://api.annict.com/graphql", headers=headers, json={"query": query})
-    if res.status_code == 200:
-        return res.json()["data"]["searchWorks"]["nodes"]
-    else:
-        st.error(f"Annict APIエラー: {res.text}")
+
+    try:
+        result = res.json()
+    except Exception as e:
+        st.error(f"❌ Annict APIのレスポンスをJSONとして解析できませんでした: {e}")
         return []
+
+    # エラーメッセージが含まれていれば表示
+    if "errors" in result:
+        st.error("❌ Annict API エラー: " + result["errors"][0].get("message", "不明なエラー"))
+        return []
+
+    # データが正しく返ってきていれば返す
+    return result.get("data", {}).get("searchWorks", {}).get("nodes", [])
+
 
 # 📝 Notionページ登録
 def create_page(row, token, db_id):
