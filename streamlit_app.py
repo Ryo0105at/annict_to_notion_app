@@ -22,7 +22,7 @@ def convert_season(season_name):
 
 # 📥 Annict APIからアニメ情報を取得
 def get_annict_data(season):
-    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"  # ← Annictの自分のトークンに置き換えてください
+    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -70,9 +70,11 @@ def get_annict_data(season):
 
     all_works = result.get("data", {}).get("searchWorks", {}).get("nodes", [])
 
-    filtered_works = [work for work in all_works if work.get("mediaText") != "Web"]
+    # ✅ media = "web" を除外
+    filtered_works = [work for work in all_works if work.get("media") != "web"]
 
     return filtered_works
+
 
 # 📝 Notion に1作品を登録
 def create_page(row, token, db_id):
