@@ -12,7 +12,8 @@ with st.expander("🔑 Notionの統合トークン・データベースIDの取�
         1. [Notionのインテグレーションページ](https://www.notion.so/my-integrations) にアクセス。
         2. 「+ New integration」をクリック。
         3. 名前を設定し、「Internal Integration Token」を生成。
-        4. 生成されたトークンをこのアプリの「Notionの統合トークン」にコピペ。
+        5. ページへのアクセス権を設定してください。
+        4. 生成されたトークン(内部インテグレーションシークレット)をこのアプリの「Notionの統合トークン」にコピペ。
 
         #### 📁 NotionのデータベースIDの取得手順
         1. 登録したいNotionデータベースをブラウザで開く。
