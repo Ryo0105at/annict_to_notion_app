@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 
+ANNICT_TOKEN = st.secrets["ANNICT_TOKEN"]
+
 st.title("🎬 Annict → Notion 自動登録ツール")
 
 # 📌 Notion用入力欄
@@ -21,9 +23,8 @@ def convert_season(season_en, year):
 
 # 📥 Annict APIからアニメ情報を取得
 def get_annict_data(season):
-    ACCESS_TOKEN = "pW-Jm_6-RBhzrvCUpRaBd90kwtCM_3KL3Kjp1U1cCRo"
     headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Authorization": f"Bearer {ANNICT_TOKEN}",
         "Content-Type": "application/json"
     }
 
@@ -91,7 +92,8 @@ def create_page(row, token, db_id):
 
     staff_list = row.get("staffs", {}).get("nodes", [])
     director = ", ".join([s.get("name", "") for s in staff_list if s.get("roleText", "").strip() == "監督"])
-    company = ", ".join([s.get("name", "") for s in staff_list if "アニメーション制作" in s.get("roleText", "")])
+    company_list = [s.get("name", "") for s in staff_list if "アニメーション制作" in s.get("roleText", "")]
+    company = [{"name": name} for name in company_list if name]
     staff_all = ", ".join([f'{s.get("roleText", "")}:{s.get("name", "")}' for s in staff_list])[:2000]
 
     cast_list = row.get("casts", {}).get("nodes", [])
