@@ -93,7 +93,7 @@ def create_page(row, token, db_id):
     data = {
         "parent": {"database_id": db_id},
         "properties": {
-            "タイトル": {"title": [{"text": {"content": title}}]},
+            "作品名": {"title": [{"text": {"content": title}}]},
             "放送時期": {"select": {"name": season}},
             "制作会社": {"rich_text": [{"text": {"content": company}}]},
             "公式サイト": {"url": website},
