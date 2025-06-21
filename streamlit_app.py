@@ -37,6 +37,9 @@ def get_annict_data(season):
           episodesCount
           officialSiteUrl
           media
+          image {
+            recommendedImageUrl
+          }
           staffs {{
             nodes {{
               roleText
