@@ -35,7 +35,7 @@ database_id = st.text_input("🗂️ NotionのデータベースID")
 # 🎯 Annictの seasonName を Notion用の形式に変換（例：2025-spring → 2025春）
 def convert_season(season_en, year):
     season_map = {
-        "WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "FALL": "秋"
+        "WINTER": "冬", "SPRING": "春", "SUMMER": "夏", "AUTUMN": "秋"
     }
     return f"{year}{season_map.get(season_en.upper(), season_en)}"
 
