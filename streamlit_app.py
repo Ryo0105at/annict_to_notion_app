@@ -26,7 +26,7 @@ with st.expander("🔑 Notionの統合トークン・データベースIDの取�
 
 # 📌 Notion用入力欄
 season = st.selectbox("📅 登録するクールを選んでください", [
-    "2025-winter", "2025-fall", "2025-summer", "2025-spring"
+    "2025-winter", "2025-autumn", "2025-summer", "2025-spring"
 ])
 
 notion_token = st.text_input("🔑 Notionの統合トークン", type="password")
