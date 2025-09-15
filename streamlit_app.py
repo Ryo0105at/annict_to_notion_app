@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import textwrap
+from datetime import datetime
 
 ANNICT_TOKEN = st.secrets["ANNICT_TOKEN"]
 
@@ -25,9 +26,46 @@ with st.expander("🔑 Notionの統合トークン・データベースIDの取�
     """), unsafe_allow_html=False)
 
 # 📌 Notion用入力欄
-season = st.selectbox("📅 登録するクールを選んでください", [
-    "2025-winter", "2025-autumn", "2025-summer", "2025-spring"
-])
+def build_season_options(start_year: int = 2025) -> list[str]:
+    """
+    2025年から現在の年までのクールを生成。
+    表示は「最新が先頭」になるよう降順で返す（例: 2025-autumn, 2025-summer, ...）。
+    """
+    current_year = datetime.now().year
+    season_order = ["winter", "spring", "summer", "autumn"]  # 年内の並び
+    options = [f"{y}-{s}" for y in range(start_year, current_year + 1) for s in season_order]
+    return list(reversed(options))  # 最新が先頭
+
+def infer_current_season(dt: datetime | None = None) -> str:
+    """
+    実行時点の月から現在クールを推定して 'YYYY-season' 形式で返す。
+    (1-3: winter, 4-6: spring, 7-9: summer, 10-12: autumn)
+    """
+    dt = dt or datetime.now()
+    m = dt.month
+    if m in (1, 2, 3):
+        season = "winter"
+    elif m in (4, 5, 6):
+        season = "spring"
+    elif m in (7, 8, 9):
+        season = "summer"
+    else:
+        season = "autumn"
+    return f"{dt.year}-{season}"
+
+season_options = build_season_options(start_year=2025)
+default_season = infer_current_season()
+if default_season not in season_options:
+    # 念のためのフォールバック（理論上ここには来ない想定）
+    default_index = 0
+else:
+    default_index = season_options.index(default_season)
+
+season = st.selectbox(
+    "📅 登録するクールを選んでください",
+    season_options,
+    index=default_index
+)
 
 notion_token = st.text_input("🔑 Notionの統合トークン", type="password")
 database_id = st.text_input("🗂️ NotionのデータベースID")
