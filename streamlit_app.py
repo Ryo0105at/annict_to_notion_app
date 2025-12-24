@@ -31,7 +31,7 @@ def build_season_options(start_year: int = 2025) -> list[str]:
     2025年から現在の年までのクールを生成。
     表示は「最新が先頭」になるよう降順で返す（例: 2025-autumn, 2025-summer, ...）。
     """
-    current_year = datetime.now().year
+    current_year = datetime.now().year + 1
     season_order = ["winter", "spring", "summer", "autumn"]  # 年内の並び
     options = [f"{y}-{s}" for y in range(start_year, current_year + 1) for s in season_order]
     return list(reversed(options))  # 最新が先頭
