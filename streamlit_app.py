@@ -134,6 +134,39 @@ def get_annict_data(season):
     return filtered_works
 
 
+# 📋 Notionデータベースの既存タイトル → ページIDのマップを取得
+def get_existing_title_map(token, db_id):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+    }
+
+    title_map = {}
+    url = f"https://api.notion.com/v1/databases/{db_id}/query"
+    payload = {"page_size": 100}
+
+    while True:
+        res = requests.post(url, headers=headers, json=payload)
+        if res.status_code != 200:
+            st.error(f"❌ Notionデータベースの取得に失敗しました (Status {res.status_code})")
+            return None
+
+        data = res.json()
+        for page in data.get("results", []):
+            title_prop = page.get("properties", {}).get("作品名", {})
+            title_list = title_prop.get("title", [])
+            if title_list:
+                title = title_list[0].get("text", {}).get("content", "")
+                title_map[title] = page["id"]
+
+        if not data.get("has_more"):
+            break
+        payload["start_cursor"] = data["next_cursor"]
+
+    return title_map
+
+
 # 📝 Notion に1作品を登録
 def create_page(row, token, db_id):
     headers = {
@@ -173,7 +206,52 @@ def create_page(row, token, db_id):
 
     res = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
 
-    # 成功・失敗に関係なく結果を返す（ステータスとレスポンス）
+    return {
+        "ok": res.status_code == 200,
+        "title": title,
+        "status": res.status_code,
+        "text": res.text
+    }
+
+
+# 🔄 Notion の既存ページを更新
+def update_page(row, token, page_id):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+    }
+
+    title = row["title"]
+    season = convert_season(row["seasonName"], row["seasonYear"])
+    episodes = row.get("episodesCount") or 0
+    website = row.get("officialSiteUrl", "") or ""
+
+    staff_list = row.get("staffs", {}).get("nodes", [])
+    director = ", ".join([s.get("name", "") for s in staff_list if s.get("roleText", "").strip() == "監督"])
+    company = ", ".join([s.get("name", "") for s in staff_list if "アニメーション制作" in s.get("roleText", "")])
+    staff_all = ", ".join([f'{s.get("roleText", "")}:{s.get("name", "")}' for s in staff_list])[:2000]
+
+    cast_list = row.get("casts", {}).get("nodes", [])
+    voice_casts = ", ".join([
+        f'{c.get("name", "不明")}（{c.get("character", {}).get("name", "？")}）'
+        for c in cast_list
+    ])[:2000]
+
+    data = {
+        "properties": {
+            "作品名": {"title": [{"text": {"content": title or "タイトル不明"}}]},
+            "放送時期": {"select": {"name": season or "未設定"}},
+            "制作会社": {"rich_text": [{"text": {"content": company or "不明"}}]},
+            "公式サイト": {"url": website if website else None},
+            "監督": {"rich_text": [{"text": {"content": director or "不明"}}]},
+            "声優": {"rich_text": [{"text": {"content": voice_casts or "不明"}}]},
+            "スタッフ": {"rich_text": [{"text": {"content": staff_all or "不明"}}]},
+        }
+    }
+
+    res = requests.patch(f"https://api.notion.com/v1/pages/{page_id}", headers=headers, json=data)
+
     return {
         "ok": res.status_code == 200,
         "title": title,
@@ -191,9 +269,30 @@ if st.button("Notionに登録する"):
         if not works:
             st.warning("Annictからデータを取得できませんでした。")
         else:
+            with st.spinner("既存データを確認中..."):
+                title_map = get_existing_title_map(notion_token, database_id)
+                if title_map is None:
+                    st.stop()
+
+            created, updated, failed = [], [], []
             with st.spinner("Notionに登録中..."):
                 for row in works:
-                    result = create_page(row, notion_token, database_id)
-                    if not result["ok"]:
-                        st.error(f'❌ {result["title"]} の登録に失敗 (Status {result["status"]})')
-                        st.code(result["text"])
+                    title = row.get("title", "")
+                    if title in title_map:
+                        result = update_page(row, notion_token, title_map[title])
+                        if result["ok"]:
+                            updated.append(title)
+                        else:
+                            failed.append(result)
+                            st.error(f'❌ {result["title"]} の更新に失敗 (Status {result["status"]})')
+                            st.code(result["text"])
+                    else:
+                        result = create_page(row, notion_token, database_id)
+                        if result["ok"]:
+                            created.append(title)
+                        else:
+                            failed.append(result)
+                            st.error(f'❌ {result["title"]} の登録に失敗 (Status {result["status"]})')
+                            st.code(result["text"])
+
+            st.success(f"✅ 新規登録: {len(created)}件　🔄 更新: {len(updated)}件")
