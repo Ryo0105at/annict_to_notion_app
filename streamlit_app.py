@@ -144,7 +144,7 @@ def get_existing_title_map(token, db_id):
 
     title_map = {}
     url = f"https://api.notion.com/v1/databases/{db_id}/query"
-    payload = {"page_size": 100}
+    payload = {"page_size": 200}
 
     while True:
         res = requests.post(url, headers=headers, json=payload)
